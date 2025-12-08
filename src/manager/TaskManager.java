@@ -1,3 +1,7 @@
+package manager;
+
+import task.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -122,7 +126,7 @@ public class TaskManager {
         return  epics.get(epicId);
     }
 
-    public  SubTask getSubTaskById(int subTaskId) {
+    public SubTask getSubTaskById(int subTaskId) {
         return subTasks.get(subTaskId);
     }
 

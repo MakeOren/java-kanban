@@ -1,3 +1,8 @@
+package main;
+
+import manager.TaskManager;
+import task.*;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -50,6 +55,7 @@ public class Main {
         System.out.println(taskManager.getSubTaskById(subTask1.getId()));
         System.out.println(taskManager.getSubTaskById(subTask2.getId()));
         System.out.println(taskManager.getSubTaskById(subTask3.getId()));
+        System.out.println();
 
         taskManager.deleteTaskById(task1.getId());
         taskManager.deleteEpicById(epic1.getId());
