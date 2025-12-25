@@ -1,20 +1,18 @@
 package main;
 
+import manager.InMemoryTaskManager;
 import manager.TaskManager;
 import task.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new TaskManager();
+        TaskManager taskManager = new InMemoryTaskManager();
 
         Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
         Task task2 = new Task("Задача2", "Описание2", TaskStatus.NEW);
 
         Epic epic1 = new Epic("Эпик1","Описание1");
-
-
-
         Epic epic2 = new Epic("Эпик2","Описание2");
 
 
