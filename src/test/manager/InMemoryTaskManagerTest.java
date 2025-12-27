@@ -11,11 +11,11 @@ import task.TaskStatus;
 import static org.junit.jupiter.api.Assertions.*;
 
 class InMemoryTaskManagerTest {
-    TaskManager taskManager;
+    private TaskManager taskManager;
 
     @BeforeEach
     void beforeEach() {
-        taskManager = new InMemoryTaskManager();
+        taskManager = Managers.getDefault();
     }
 
     @Test

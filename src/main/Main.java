@@ -1,13 +1,14 @@
 package main;
 
 import manager.InMemoryTaskManager;
+import manager.Managers;
 import manager.TaskManager;
 import task.*;
 
 public class Main {
 
     public static void main(String[] args) {
-        TaskManager taskManager = new InMemoryTaskManager();
+        TaskManager taskManager = Managers.getDefault();
 
         Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
         Task task2 = new Task("Задача2", "Описание2", TaskStatus.NEW);
