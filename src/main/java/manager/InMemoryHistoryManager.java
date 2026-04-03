@@ -4,7 +4,7 @@ import task.Task;
 
 import java.util.*;
 
-public class InMemoryHistoryManager implements HistoryManager{
+public class InMemoryHistoryManager implements HistoryManager {
 
     private Map<Integer,Node> taskHistory;
     private Node head = null;
@@ -88,7 +88,7 @@ public class InMemoryHistoryManager implements HistoryManager{
         List<Task> tasks = new ArrayList<>();
         Node node = head;
 
-        while(node != null) {
+        while (node != null) {
             tasks.add(node.task);
             node = node.next;
         }
