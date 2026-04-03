@@ -10,6 +10,7 @@ import task.TaskStatus;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class InMemoryHistoryManagerTest {
 
@@ -68,6 +69,92 @@ class InMemoryHistoryManagerTest {
             }
         }
 
+    }
+
+
+    @Test
+    void shouldAddTask() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        Task task = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        history.add(task);
+
+        List<Task> list = history.getHistory();
+
+        assertEquals(1, list.size());
+        assertEquals(task, list.get(0));
+    }
+
+    @Test
+    void shouldNotDuplicateTasks() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        Task task = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        history.add(task);
+        history.add(task);
+
+        List<Task> list = history.getHistory();
+
+        assertEquals(1, list.size());
+    }
+
+    @Test
+    void shouldMoveTaskToEnd() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
+        Task task2 = new Task("Задача2", "Описание1", TaskStatus.NEW);
+
+        task1.setId(1);
+        task2.setId(2);
+
+        history.add(task1);
+        history.add(task2);
+        history.add(task1);
+
+        List<Task> list = history.getHistory();
+
+        assertEquals(task2, list.get(0));
+        assertEquals(task1, list.get(1));
+    }
+
+    @Test
+    void shouldRemoveTask() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
+        Task task2 = new Task("Задача2", "Описание1", TaskStatus.NEW);
+
+        task1.setId(1);
+        task2.setId(2);
+
+        history.add(task1);
+        history.add(task2);
+
+        history.remove(1);
+
+        List<Task> list = history.getHistory();
+
+        assertEquals(1, list.size());
+        assertEquals(task2, list.get(0));
+    }
+
+    @Test
+    void shouldReturnEmptyHistory() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        assertTrue(history.getHistory().isEmpty());
+    }
+
+    @Test
+    void shouldIgnoreNull() {
+        HistoryManager history = new InMemoryHistoryManager();
+
+        history.add(null);
+
+        assertTrue(history.getHistory().isEmpty());
     }
 
 }
