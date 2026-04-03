@@ -2,11 +2,14 @@ package manager;
 
 import task.Task;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class InMemoryHistoryManager implements HistoryManager {
 
-    private Map<Integer,Node> taskHistory;
+    private Map<Integer, Node> taskHistory;
     private Node head = null;
     private Node tail = null;
 
@@ -69,7 +72,6 @@ public class InMemoryHistoryManager implements HistoryManager {
     }
 
 
-
     private Node linkLast(Task task) {
         Node node = new Node(tail, task);
 
@@ -81,7 +83,7 @@ public class InMemoryHistoryManager implements HistoryManager {
 
         tail = node;
 
-        return  node;
+        return node;
     }
 
     private List<Task> getTasks() {
