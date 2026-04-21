@@ -16,9 +16,8 @@ public class Main {
         Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
         Task task2 = new Task("Задача2", "Описание2", TaskStatus.NEW);
 
-        Epic epic1 = new Epic("Эпик1","Описание1");
-        Epic epic2 = new Epic("Эпик2","Описание2");
-
+        Epic epic1 = new Epic("Эпик1", "Описание1");
+        Epic epic2 = new Epic("Эпик2", "Описание2");
 
 
         taskManager.addTask(task1);
