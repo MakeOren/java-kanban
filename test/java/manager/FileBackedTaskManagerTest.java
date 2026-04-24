@@ -92,7 +92,7 @@ class FileBackedTaskManagerTest {
         manager.addTask(task);
 
         task.setTitle("Новое имя");
-            
+        manager.updateTask(task);
 
         FileBackedTaskManager loaded = FileBackedTaskManager.loadFromFile(file);
         assertEquals("Новое имя", loaded.getTaskById(task.getId()).getTitle());
