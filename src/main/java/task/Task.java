@@ -8,6 +8,10 @@ public class Task {
     private String title;
     private String description;
 
+    public TaskType getType() {
+        return TaskType.TASK;
+    }
+
     public int getId() {
         return id;
     }
