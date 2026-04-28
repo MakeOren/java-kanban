@@ -3,9 +3,7 @@ package manager;
 import task.*;
 
 import java.io.*;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
 
@@ -190,9 +188,6 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         try (BufferedReader bf = new BufferedReader(new FileReader(file))) {
             bf.readLine();
             String line;
-            Map<Integer, Task> tasks = new HashMap<>();
-            Map<Integer, Epic> epics = new HashMap<>();
-            Map<Integer, SubTask> subTasks = new HashMap<>();
 
             while ((line = bf.readLine()) != null) {
                 Task task = fileBackedTaskManager.fromString(line);
@@ -200,23 +195,19 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                     maxId = task.getId();
                 }
 
-                if (task instanceof Epic epic) {
-                    epics.put(epic.getId(), epic);
-                } else if (task instanceof SubTask subTask) {
-                    subTasks.put(subTask.getId(), subTask);
-                } else {
-                    tasks.put(task.getId(), task);
+                switch (task.getType()) {
+                    case TASK -> fileBackedTaskManager.setTask(task);
+                    case EPIC -> fileBackedTaskManager.setEpic((Epic) task);
+                    case SUBTASK -> fileBackedTaskManager.setSubtask((SubTask) task);
                 }
+
             }
 
-            for (Map.Entry<Integer, SubTask> entrySubTask : subTasks.entrySet()) {
-                Epic epic = epics.get(entrySubTask.getValue().getEpicId());
-                epic.addSubTaskId(entrySubTask.getKey());
+            for (SubTask subTask : fileBackedTaskManager.getSubTasksList()) {
+                Epic epic = fileBackedTaskManager.getEpicById(subTask.getEpicId());
+                epic.addSubTaskId(subTask.getId());
             }
 
-            fileBackedTaskManager.setTasks(tasks);
-            fileBackedTaskManager.setEpics(epics);
-            fileBackedTaskManager.setSubTasks(subTasks);
 
         } catch (IOException e) {
             throw new ManagerSaveException("Ошибка при чтении файла: " + file.getPath(), e);

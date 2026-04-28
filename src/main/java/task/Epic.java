@@ -7,6 +7,11 @@ import java.util.List;
 public class Epic extends Task {
     private List<Integer> subTaskIds;
 
+    @Override
+    public TaskType getType() {
+        return TaskType.EPIC;
+    }
+
     public List<Integer> getSubTaskIds() {
         return subTaskIds;
     }
