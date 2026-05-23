@@ -6,9 +6,11 @@ import java.util.Objects;
 
 public class Task {
     private int id;
-    private TaskStatus taskStatus;
     private String title;
     private String description;
+    private TaskStatus taskStatus;
+    private Duration duration;
+    private LocalDateTime startTime;
 
     public LocalDateTime getEndTime() {
         if (startTime == null) {
@@ -33,9 +35,6 @@ public class Task {
     public void setDuration(Duration duration) {
         this.duration = duration;
     }
-
-    private Duration duration;
-    private LocalDateTime startTime;
 
     public TaskType getType() {
         return TaskType.TASK;
