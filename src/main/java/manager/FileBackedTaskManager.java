@@ -3,6 +3,8 @@ package manager;
 import task.*;
 
 import java.io.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public class FileBackedTaskManager extends InMemoryTaskManager {
@@ -91,45 +93,63 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
     }
 
     private String toString(Task task) {
+        String duration = task.getDuration() != null ? String.valueOf(task.getDuration().toMinutes()) : "";
+        String startTime = task.getStartTime() != null ? task.getStartTime().toString() : "";
 
         if (task instanceof SubTask) {
-            return String.format("%s,%s,%s,%s,%s,%d",
+            return String.format("%s,%s,%s,%s,%s,%d,%s,%s",
                     task.getId(),
                     TaskType.SUBTASK,
                     task.getTitle(),
                     task.getTaskStatus(),
                     task.getDescription(),
-                    ((SubTask) task).getEpicId());
+                    ((SubTask) task).getEpicId(),
+                    duration,
+                    startTime);
         } else if (task instanceof Epic) {
-            return String.format("%s,%s,%s,%s,%s,",
+            return String.format("%s,%s,%s,%s,%s,%s,%s,%s",
                     task.getId(),
                     TaskType.EPIC,
                     task.getTitle(),
                     task.getTaskStatus(),
-                    task.getDescription());
+                    task.getDescription(),
+                    "",
+                    duration,
+                    startTime);
         } else {
-            return String.format("%s,%s,%s,%s,%s,",
+            return String.format("%s,%s,%s,%s,%s,%s,%s,%s",
                     task.getId(),
                     TaskType.TASK,
                     task.getTitle(),
                     task.getTaskStatus(),
-                    task.getDescription());
+                    task.getDescription(),
+                    "",
+                    duration,
+                    startTime);
         }
     }
 
     private Task fromString(String value) {
-        String[] parts = value.split(",");
+        String[] parts = value.split(",", -1);
         int id = Integer.parseInt(parts[0]);
         TaskType taskType = TaskType.valueOf(parts[1]);
         String title = parts[2];
         TaskStatus taskStatus = TaskStatus.valueOf(parts[3]);
         String description = parts[4];
 
+        String durationStr = parts[6].isEmpty() ? "0" : parts[6];
+        String startTimeStr = parts[7].isEmpty() ? null : parts[7];
+
+        Duration duration = Duration.ofMinutes(Long.parseLong(durationStr));
+        LocalDateTime startTime = startTimeStr != null ? LocalDateTime.parse(startTimeStr) : null;
+
         switch (taskType) {
             case EPIC -> {
                 Epic epic = new Epic(title, description);
                 epic.setId(id);
                 epic.setTaskStatus(taskStatus);
+                epic.setDuration(duration);
+                epic.setStartTime(startTime);
                 return epic;
             }
             case SUBTASK -> {
@@ -137,11 +157,15 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
                 SubTask subTask = new SubTask(title, description, taskStatus);
                 subTask.setId(id);
                 subTask.setEpicId(epicId);
+                subTask.setDuration(duration);
+                subTask.setStartTime(startTime);
                 return subTask;
             }
             case TASK -> {
                 Task task = new Task(title, description, taskStatus);
                 task.setId(id);
+                task.setDuration(duration);
+                task.setStartTime(startTime);
                 return task;
             }
             default -> {
@@ -157,7 +181,7 @@ public class FileBackedTaskManager extends InMemoryTaskManager {
         List<Task> tasks = getTasksList();
 
         try (BufferedWriter bf = new BufferedWriter(new FileWriter(file))) {
-            bf.write("id,type,name,status,description,epic");
+            bf.write("id,type,name,status,description,epic,duration,startTime");
             bf.newLine();
 
             for (Task task : tasks) {

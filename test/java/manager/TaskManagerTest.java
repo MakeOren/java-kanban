@@ -1,0 +1,161 @@
+package manager;
+
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import task.Epic;
+import task.SubTask;
+import task.Task;
+import task.TaskStatus;
+
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.*;
+
+public abstract class TaskManagerTest<T extends TaskManager> {
+    protected T taskManager;
+
+    protected abstract T createManager();
+
+    @BeforeEach
+    public void setUp() {
+        taskManager = createManager();
+    }
+
+    @Test
+    void epicNotSubtaskOfItself() {
+        Epic epic = new Epic("Эпик", "Описание");
+        SubTask subTask = new SubTask("Подзадача", "Описание", TaskStatus.NEW);
+
+        taskManager.addEpic(epic);
+
+        subTask.setEpicId(epic.getId());
+        subTask.setId(epic.getId());
+
+        assertNotNull(taskManager.addSubTask(subTask), "Подзадача должна добавится");
+
+        assertEquals(epic.getId(), subTask.getEpicId(), "Подзадача привязана к эпику");
+        assertNotEquals(epic.getId(), subTask.getId(), "Id подзадачи отличается от id эпика");
+    }
+
+
+    @Test
+    void addAndRetrieveTasksById() {
+        Task task = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        Epic epic = new Epic("Эпик1", "Описание1");
+
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+
+        SubTask subTask = new SubTask("Подзадача1", "Описание1", TaskStatus.NEW);
+        subTask.setEpicId(epic.getId());
+
+        taskManager.addSubTask(subTask);
+
+        assertEquals(epic, taskManager.getEpicById(epic.getId()));
+        assertEquals(task, taskManager.getTaskById(task.getId()));
+        assertEquals(subTask, taskManager.getSubTaskById(subTask.getId()));
+    }
+
+    @Test
+    void taskIdsAreUniqueOrOverwritten() {
+        Task task1 = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        taskManager.addTask(task1);
+
+        Task task2 = new Task("Задача2", "Описание2", TaskStatus.NEW);
+        task2.setId(task1.getId());
+
+        taskManager.addTask(task2);
+
+
+    }
+
+    @Test
+    void shouldHaveUniqueIdsForAllTasks() {
+        Task task = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        Epic epic = new Epic("Эпик1", "Описание1");
+
+        taskManager.addTask(task);
+        task.setId(2);
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+
+        SubTask subTask = new SubTask("Подзадача1", "Описание1", TaskStatus.NEW);
+        subTask.setEpicId(epic.getId());
+
+        taskManager.addSubTask(subTask);
+
+        assertNotEquals(task.getId(), epic.getId());
+        assertNotEquals(task.getId(), subTask.getId());
+        assertNotEquals(epic.getId(), subTask.getId());
+    }
+
+    @Test
+    void shouldNotChangeTaskFieldsWhenAddedToTaskManager() {
+        Task task = new Task("Задача1", "Описание1", TaskStatus.NEW);
+
+        Epic epic = new Epic("Эпик1", "Описание1");
+
+        taskManager.addTask(task);
+        taskManager.addEpic(epic);
+
+        SubTask subTask = new SubTask("Подзадача1", "Описание1", TaskStatus.NEW);
+        subTask.setEpicId(epic.getId());
+
+        taskManager.addSubTask(subTask);
+
+        assertEquals(task.getTitle(), taskManager.getTaskById(task.getId()).getTitle());
+        assertEquals(task.getDescription(), taskManager.getTaskById(task.getId()).getDescription());
+        assertEquals(task.getTaskStatus(), taskManager.getTaskById(task.getId()).getTaskStatus());
+
+        assertEquals(epic.getSubTaskIds(), taskManager.getEpicById(epic.getId()).getSubTaskIds());
+        assertEquals(epic.getTaskStatus(), taskManager.getEpicById(epic.getId()).getTaskStatus());
+        assertEquals(epic.getTitle(), taskManager.getEpicById(epic.getId()).getTitle());
+        assertEquals(epic.getDescription(), taskManager.getEpicById(epic.getId()).getDescription());
+
+        assertEquals(subTask.getTitle(), taskManager.getSubTaskById(subTask.getId()).getTitle());
+        assertEquals(subTask.getDescription(), taskManager.getSubTaskById(subTask.getId()).getDescription());
+        assertEquals(subTask.getTaskStatus(), taskManager.getSubTaskById(subTask.getId()).getTaskStatus());
+        assertEquals(subTask.getEpicId(), taskManager.getSubTaskById(subTask.getId()).getEpicId());
+
+
+    }
+
+    @Test
+    void shouldReturnPrioritizedTasksSortedByStartTime() {
+        Task task1 = new Task("Task1", "Desc", TaskStatus.NEW);
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 12, 0));
+        task1.setDuration(Duration.ofMinutes(30));
+
+        Task task2 = new Task("Task2", "Desc", TaskStatus.NEW);
+        task2.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        task2.setDuration(Duration.ofMinutes(60));
+
+        taskManager.addTask(task1);
+        taskManager.addTask(task2);
+
+        List<Task> prioritized = taskManager.getPrioritizedTasks();
+        assertEquals(2, prioritized.size());
+        assertEquals(task2.getId(), prioritized.get(0).getId());
+        assertEquals(task1.getId(), prioritized.get(1).getId());
+    }
+
+    @Test
+    void shouldNotAddTasksWithIntersection() {
+        Task task1 = new Task("Task1", "Desc", TaskStatus.NEW);
+        task1.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 0));
+        task1.setDuration(Duration.ofMinutes(60));
+        taskManager.addTask(task1);
+
+        Task task2 = new Task("Task2", "Desc", TaskStatus.NEW);
+        task2.setStartTime(LocalDateTime.of(2024, 1, 1, 10, 30));
+        task2.setDuration(Duration.ofMinutes(30));
+
+        Task result = taskManager.addTask(task2);
+        assertNull(result);
+    }
+}
