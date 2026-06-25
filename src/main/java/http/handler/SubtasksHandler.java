@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.NotFoundException;
+import http.HttpStatusCode;
 import manager.TaskManager;
 import task.SubTask;
 
@@ -52,7 +53,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
         int id = extractId(path);
         manager.getSubTaskOrThrow(id);
         manager.deleteSubTaskById(id);
-        sendText(exchange, String.format("Задача id = %d удалена", id), 200);
+        sendText(exchange, String.format("Задача id = %d удалена", id), HttpStatusCode.OK.getCode());
 
     }
 
@@ -67,7 +68,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                 return;
             }
             String json = gson.toJson(createSubtask);
-            sendText(exchange, json, 201);
+            sendText(exchange, json, HttpStatusCode.CREATED.getCode());
         } else {
             manager.getSubTaskOrThrow(subTask.getId());
             SubTask updateSubtask = manager.updateSubTask(subTask);
@@ -76,7 +77,7 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
                 sendHasInteractions(exchange);
                 return;
             } else {
-                sendText(exchange, json, 201);
+                sendText(exchange, json, HttpStatusCode.CREATED.getCode());
             }
         }
 
@@ -85,13 +86,13 @@ public class SubtasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetSubtasks(HttpExchange exchange) throws IOException {
         List<SubTask> subTasks = manager.getSubTasksList();
         String json = gson.toJson(subTasks);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
     private void handleGetSubtask(HttpExchange exchange, String path) throws IOException {
         int id = extractId(path);
         SubTask subTask = manager.getSubTaskOrThrow(id);
         String json = gson.toJson(subTask);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 }

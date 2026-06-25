@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.NotFoundException;
+import http.HttpStatusCode;
 import manager.TaskManager;
 import task.Task;
 
@@ -53,7 +54,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
         int id = extractId(path);
         manager.getTaskOrThrow(id);
         manager.deleteTaskById(id);
-        sendText(exchange, String.format("Задача id = %d удалена", id), 200);
+        sendText(exchange, String.format("Задача id = %d удалена", id), HttpStatusCode.OK.getCode());
 
     }
 
@@ -67,7 +68,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 return;
             }
             String json = gson.toJson(createTask);
-            sendText(exchange, json, 201);
+            sendText(exchange, json, HttpStatusCode.CREATED.getCode());
         } else {
             manager.getTaskOrThrow(task.getId());
             Task updateTask = manager.updateTask(task);
@@ -76,7 +77,7 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
                 sendHasInteractions(exchange);
                 return;
             } else {
-                sendText(exchange, json, 201);
+                sendText(exchange, json, HttpStatusCode.CREATED.getCode());
             }
         }
 
@@ -85,14 +86,14 @@ public class TasksHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetTasks(HttpExchange exchange) throws IOException {
         List<Task> tasks = manager.getTasksList();
         String json = gson.toJson(tasks);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
     private void handleGetTask(HttpExchange exchange, String path) throws IOException {
         int id = extractId(path);
         Task task = manager.getTaskOrThrow(id);
         String json = gson.toJson(task);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
 

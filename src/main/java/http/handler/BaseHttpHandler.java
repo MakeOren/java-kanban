@@ -1,6 +1,7 @@
 package http.handler;
 
 import com.sun.net.httpserver.HttpExchange;
+import http.HttpStatusCode;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
@@ -16,17 +17,17 @@ public class BaseHttpHandler {
     }
 
     protected void sendNotFound(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(404, -1);
+        h.sendResponseHeaders(HttpStatusCode.NOT_FOUND.getCode(), -1);
         h.close();
     }
 
     protected void sendInternalError(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(500, -1);
+        h.sendResponseHeaders(HttpStatusCode.INTERNAL_ERROR.getCode(), -1);
         h.close();
     }
 
     protected void sendHasInteractions(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(406, -1);
+        h.sendResponseHeaders(HttpStatusCode.NOT_ACCEPTABLE.getCode(), -1);
         h.close();
     }
 
@@ -45,7 +46,7 @@ public class BaseHttpHandler {
     }
 
     protected void sendBadRequest(HttpExchange h) throws IOException {
-        h.sendResponseHeaders(400, -1);
+        h.sendResponseHeaders(HttpStatusCode.BAD_REQUEST.getCode(), -1);
         h.close();
     }
 

@@ -3,6 +3,7 @@ package http.handler;
 import com.google.gson.Gson;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
+import http.HttpStatusCode;
 import manager.TaskManager;
 import task.Task;
 
@@ -38,6 +39,6 @@ public class HistoryHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetHistory(HttpExchange exchange) throws IOException {
         List<Task> tasks = manager.getHistory();
         String json = gson.toJson(tasks);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 }

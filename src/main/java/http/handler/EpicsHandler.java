@@ -5,6 +5,7 @@ import com.google.gson.JsonSyntaxException;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import exceptions.NotFoundException;
+import http.HttpStatusCode;
 import manager.TaskManager;
 import task.Epic;
 import task.SubTask;
@@ -55,7 +56,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
     private void handleGetEpics(HttpExchange exchange) throws IOException {
         List<Epic> epics = manager.getEpicList();
         String json = gson.toJson(epics);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
     private void handleGetEpicSubtasks(HttpExchange exchange, String path) throws IOException {
@@ -63,21 +64,21 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
         manager.getEpicOrThrow(epicId);
         List<SubTask> subTasks = manager.getSubTasksByEpic(epicId);
         String json = gson.toJson(subTasks);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
     private void handleGetEpic(HttpExchange exchange, String path) throws IOException {
         int epicId = extractId(path);
         Epic epic = manager.getEpicOrThrow(epicId);
         String json = gson.toJson(epic);
-        sendText(exchange, json, 200);
+        sendText(exchange, json, HttpStatusCode.OK.getCode());
     }
 
     private void handleDeleteEpic(HttpExchange exchange, String path) throws IOException {
         int epicId = extractId(path);
         manager.getEpicOrThrow(epicId);
         manager.deleteEpicById(epicId);
-        sendText(exchange, String.format("Задача id = %d удалена", epicId), 200);
+        sendText(exchange, String.format("Задача id = %d удалена", epicId), HttpStatusCode.OK.getCode());
     }
 
     private void handleCreateEpic(HttpExchange exchange) throws IOException {
@@ -90,7 +91,7 @@ public class EpicsHandler extends BaseHttpHandler implements HttpHandler {
             return;
         }
         String json = gson.toJson(createEpic);
-        sendText(exchange, json, 201);
+        sendText(exchange, json, HttpStatusCode.CREATED.getCode());
 
     }
 
