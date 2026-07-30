@@ -158,4 +158,63 @@ public abstract class TaskManagerTest<T extends TaskManager> {
         Task result = taskManager.addTask(task2);
         assertNull(result);
     }
+
+    @Test
+    void shouldRemoveSubtaskIdFromEpicWhenSubtaskDeleted() {
+        Epic epic = new Epic("Epic", "Desc");
+        taskManager.addEpic(epic);
+
+        SubTask subTask = new SubTask("Subtask", "Desc", TaskStatus.NEW);
+        subTask.setEpicId(epic.getId());
+        taskManager.addSubTask(subTask);
+
+        int subTaskId = subTask.getId();
+        int epicId = epic.getId();
+
+        assertTrue(taskManager.getEpicById(epicId).getSubTaskIds().contains(subTaskId));
+
+        taskManager.deleteSubTaskById(subTaskId);
+
+        assertFalse(taskManager.getEpicById(epicId).getSubTaskIds().contains(subTaskId));
+    }
+
+    @Test
+    void shouldUpdateEpicStatusWhenSubtasksChange() {
+        Epic epic = new Epic("Epic", "Desc");
+        taskManager.addEpic(epic);
+
+        SubTask subTask1 = new SubTask("Subtask1", "Desc", TaskStatus.NEW);
+        subTask1.setEpicId(epic.getId());
+        taskManager.addSubTask(subTask1);
+
+        SubTask subTask2 = new SubTask("Subtask2", "Desc", TaskStatus.NEW);
+        subTask2.setEpicId(epic.getId());
+        taskManager.addSubTask(subTask2);
+
+        assertEquals(TaskStatus.NEW, taskManager.getEpicById(epic.getId()).getTaskStatus());
+
+        subTask1.setTaskStatus(TaskStatus.DONE);
+        subTask2.setTaskStatus(TaskStatus.DONE);
+        taskManager.updateSubTask(subTask1);
+        taskManager.updateSubTask(subTask2);
+
+        assertEquals(TaskStatus.DONE, taskManager.getEpicById(epic.getId()).getTaskStatus());
+    }
+
+    @Test
+    void shouldDeleteSubtasksWhenEpicDeleted() {
+        Epic epic = new Epic("Epic", "Desc");
+        taskManager.addEpic(epic);
+
+        SubTask subTask = new SubTask("Subtask", "Desc", TaskStatus.NEW);
+        subTask.setEpicId(epic.getId());
+        taskManager.addSubTask(subTask);
+
+        assertEquals(1, taskManager.getSubTasksList().size());
+
+        taskManager.deleteEpicById(epic.getId());
+
+        assertEquals(0, taskManager.getSubTasksList().size());
+        assertNull(taskManager.getEpicById(epic.getId()));
+    }
 }

@@ -1,5 +1,6 @@
 package manager;
 
+import exceptions.NotFoundException;
 import task.Epic;
 import task.SubTask;
 import task.Task;
@@ -11,7 +12,7 @@ public interface TaskManager {
 
     Task addTask(Task task);
 
-    Task addEpic(Epic epic);
+    Epic addEpic(Epic epic);
 
     SubTask addSubTask(SubTask subTask);
 
@@ -33,11 +34,11 @@ public interface TaskManager {
 
     SubTask getSubTaskById(int subTaskId);
 
-    void updateTask(Task task);
+    Task updateTask(Task task);
 
     void updateEpic(Epic epic);
 
-    void updateSubTask(SubTask subTask);
+    SubTask updateSubTask(SubTask subTask);
 
     void deleteTaskById(int taskId);
 
@@ -48,4 +49,12 @@ public interface TaskManager {
     List<Task> getHistory();
 
     List<Task> getPrioritizedTasks();
+
+    Task getTaskOrThrow(int id) throws NotFoundException;
+
+    Epic getEpicOrThrow(int id) throws NotFoundException;
+
+    SubTask getSubTaskOrThrow(int id) throws NotFoundException;
+
+
 }
